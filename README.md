@@ -41,18 +41,18 @@ Every schema is verified against Lenco's published OpenAPI spec, with dates note
 
 ## Install
 
-**With the GitHub CLI:**
+**With the skills CLI:**
 ```bash
-gh skill install <your-username>/lenco-payments
+npx skills add uncledevhq/lenco-payments
 ```
 
 **Manually (Claude Code):**
 ```bash
-git clone https://github.com/<your-username>/lenco-payments.git \
+git clone https://github.com/uncledevhq/lenco-payments.git \
   .claude/skills/lenco-payments
 ```
 
-**Claude (web/desktop):** upload the packaged `.skill` file from Releases.
+**Claude (web/desktop):** download this repo as a `.zip` (Code → Download ZIP) and upload it under Settings → Capabilities → Skills.
 
 Then just ask for Lenco work normally — it auto-triggers on mentions of Lenco, mobile money, ZMW collections, and similar. You don't invoke it by name.
 
