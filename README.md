@@ -4,7 +4,7 @@ An [Agent Skill](https://agentskills.io) for integrating the **Lenco payments AP
 
 Works with Claude Code, Claude, Cursor, Codex, Gemini CLI, and anything else that speaks the agentskills.io `SKILL.md` standard.
 
-By **Chomba Chanda** ([uncledev](https://github.com/uncledev)) · MIT
+By **Chomba Chanda** ([uncledevhq](https://github.com/uncledevhq)) · MIT
 
 > **Unofficial — but it works.** 🙂
 > Not affiliated with, endorsed by, or reviewed by Lenco. This is a community-built skill by a developer who ships on their API. Every schema in here is transcribed from Lenco's own published OpenAPI spec and dated, so you can see how fresh it is. For anything that moves real money, test it in sandbox first — same as you would with any integration you didn't write yourself.
@@ -68,6 +68,17 @@ If you find drift, please open an issue (see below). That's what keeps this accu
 ## Contributing
 
 Found a gap or a drift? Open an issue with the endpoint and the actual payload you got back. Corrections backed by a real request/response are the most useful thing you can send.
+
+## Author
+
+**Chomba Chanda** (uncledev) — fullstack dev shipping production fintech in Zambia.
+
+- GitHub: [@uncledevhq](https://github.com/uncledevhq)
+- X/Twitter: [@uncledevhq](https://x.com/uncledevhq)
+- LinkedIn: [uncledevhq](https://www.linkedin.com/in/uncledevhq/)
+- Email: [uncledevhq@gmail.com](mailto:uncledevhq@gmail.com)
+
+Stuck on a Lenco integration, or want a second pair of eyes before you move real money? This is the work I do — hit me up. Same goes for other work and collabs.
 
 ## License
 
