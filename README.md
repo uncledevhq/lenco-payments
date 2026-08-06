@@ -11,16 +11,19 @@ By **Chomba Chanda** ([uncledevhq](https://github.com/uncledevhq)) · MIT
 
 ## Why
 
-Lenco's API docs are complete but flat. If you're building against them, you end up rediscovering the same things everyone else does:
+Your AI agent doesn't know Lenco. A Zambian payments API is barely represented in any model's training data — so today, integrating Lenco with an agent means *you* are the context pipeline: tab over to the docs, hunt down the endpoint to initiate a mobile money charge, paste it into the prompt, correct the path it hallucinated anyway, go back for the response schema, again for the webhook format. Or you let the agent crawl the docs itself and burn time and tokens rediscovering what someone already knows.
 
-- A `200` can carry `status: false` — the HTTP code isn't the success signal
-- The shape of `data` on error is inconsistent across endpoints (`null` here, `[]` there)
-- Duplicate references are rejected, and the response **doesn't** return the original transaction — so a naive retry after a timeout can report "failed" on a transfer that actually went through
-- `status` and `settlementStatus` on a collection mean different things; conflating them breaks reconciliation
-- Lenco's own webhook examples disagree on whether the signature covers the raw body or re-serialized JSON
-- Money arrives as decimal strings but is accepted as JSON numbers
+This skill ends that loop. Install it once and your agent already has the whole API in its head — every v2.0 endpoint, request/response schema, webhook signature scheme, and sandbox test number, verified against Lenco's OpenAPI spec and dated. Say "add mobile money checkout" and it puts the pieces together. No tab-switching, no doc-pasting, no hallucinated endpoints.
 
-This skill encodes all of that, so your agent gets it right the first time instead of you catching it in code review — or in production.
+And it carries the layer the docs don't have — the production behavior you only learn by shipping real money:
+
+- The duplicate-reference semantics that make a naive retry-after-timeout report "failed" on a transfer that actually went through
+- Why `status` and `settlementStatus` on a collection drive different sides of your accounting, and conflating them breaks reconciliation
+- Which of Lenco's own webhook signature examples to trust (they disagree), and the `timingSafeEqual` crash the obvious implementation hits
+- The response envelope and error-shape inconsistencies your error handling has to survive
+- How to handle money that arrives as decimal strings but is accepted as JSON numbers
+
+Whether you've shipped five payment integrations or you're vibe-coding your first, the outcome is the same: your agent builds it the way someone who's shipped this before would — first time, not after code review caught it.
 
 ## What's in it
 
