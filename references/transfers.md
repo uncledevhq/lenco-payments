@@ -37,6 +37,13 @@ interface LencoTransfer {
 }
 ```
 
+### Fees: added on top, and not knowable in advance
+
+`fee` is charged **on top of** `amount` — the account is debited `amount + fee`. Two consequences:
+
+- **Balance checks before a payout run must budget for fees**, not just the sum of amounts — otherwise a batch that "fits" the balance fails partway through with errorCode `02` (insufficient funds).
+- The rate schedule isn't in the API; read the actual `fee` from each transfer response and reconcile from actuals. See `collections.md` → "Fee rates are data, not constants" — and note the asymmetry: collection fees are *deducted* from what you receive, transfer fees are *added* to what you send.
+
 ### Money is a string — keep it that way
 
 `amount` and `fee` arrive as decimal strings (`"20.00"`, `"8.50"`). Don't `parseFloat` them into your domain model. IEEE-754 doubles can't represent most decimal fractions exactly, so `0.1 + 0.2 !== 0.3`, and summing a few thousand transfer fees in floats gives you a reconciliation total that's off by cents — the kind of bug that surfaces as "our numbers don't match Lenco's statement" months later.

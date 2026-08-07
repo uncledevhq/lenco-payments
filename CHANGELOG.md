@@ -4,6 +4,11 @@ Lenco ships no changelog for their API — this skill does. Every content correc
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions are dated; "verified in production" means confirmed against a live Lenco account, which outranks "transcribed from docs."
 
+## [1.3.0] — 2026-08-07
+
+### Added
+- Fee semantics made explicit: the collection/transfer fee asymmetry (deducted from what you receive vs added to what you send), fee-aware balance budgeting for payout runs, and "rates are data, not constants" guidance — read actual `fee` values, never hardcode a rate. Rate *schedules* are deliberately excluded: they're account-specific and not in the API.
+
 ## [1.2.0] — 2026-08-07
 
 ### Added

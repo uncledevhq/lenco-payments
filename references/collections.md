@@ -80,6 +80,23 @@ A collection can be `successful` with `settlementStatus: "pending"` and `settlem
 
 For card collections, the docs note `bearer` in the payload is **only used if not already set in your dashboard** — dashboard config wins. Worth checking what yours is set to rather than assuming the API value applies.
 
+### The fee asymmetry (collections vs transfers)
+
+Fees sit on opposite sides of the two directions:
+
+- **Collections** (money in): fee is **deducted** from what reaches you — customer pays `10.00`, you settle `9.75` (with `bearer: merchant`).
+- **Transfers** (money out): fee is **added** to what leaves you — you send `20.00`, your account is debited `20.00 + fee`.
+
+So a full collect-and-payout cycle loses margin on *both* legs. If you're building anything that passes money through (marketplace, payroll on top of collections, agent float), model both fees or your unit economics silently overstate.
+
+### Fee rates are data, not constants
+
+Neither the API nor this skill carries Lenco's fee *schedule* — rates live on Lenco's pricing page and dashboard, and can be account-specific. Engineering consequences:
+
+- **Never hardcode a fee percentage** in code or tests. Read the actual `fee` off each completed collection/transfer and reconcile from actuals.
+- If you must show an estimated fee *before* initiating (checkout UX, payout previews), source the rate from your own config, label it an estimate, and true it up from the real `fee` after completion — remember `fee` is `null` until then.
+- Watch `fee` in reconciliation: if Lenco changes your rate, the per-transaction `fee` field is where you find out. A drift alert ("fee ≠ expected rate ± tolerance") turns a silent margin change into a ticket.
+
 ## Mobile money collections
 
 ```typescript
