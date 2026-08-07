@@ -64,7 +64,7 @@ The examples target **NestJS + Prisma**, since that's what it was built against.
 
 Covers Lenco API **v2.0** (payments: collections, transfers, recipients, settlements). Lenco also publishes a v1.0 surface (virtual accounts, bill payments, POS terminals) which is **not** covered here — it's a different product, not an older version of the same one.
 
-Lenco ships no changelog, so their API can drift silently. Each file carries a last-verified date — treat it as a confidence marker, not a guarantee, and spot-check against the live docs before relying on anything for production money movement.
+Lenco ships no changelog, so their API can drift silently. This skill keeps one instead: [CHANGELOG.md](CHANGELOG.md) records every correction with a date and how it was verified — corrections marked "verified in production" come from live Lenco accounts and outrank the docs. Each file also carries a last-verified date; treat it as a confidence marker, not a guarantee, and spot-check against the live docs before relying on anything for production money movement.
 
 If you find drift, please open an issue (see below). That's what keeps this accurate for everyone else.
 
