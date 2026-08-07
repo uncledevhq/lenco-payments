@@ -1,10 +1,12 @@
 # Lenco Webhooks
 
-Verified against Lenco's webhook docs, 2026-08-06.
+Verified against Lenco's webhook docs 2026-08-06; setup + signing key corrected against a live production dashboard 2026-08-07.
 
 ## Setup
 
-No self-service config — email support@lenco.co to register your webhook URL. Lenco's own setup notes:
+Configure the webhook URL in the **Lenco dashboard's webhook settings** — self-service, no support email needed. The same screen displays your **webhook signing secret**; copy it into `LENCO_WEBHOOK_SECRET`. (Lenco's docs still describe emailing support@lenco.co to register the URL — that's outdated; the dashboard is the current path. Verified on a live production account, 2026-08-07.)
+
+Lenco's own setup notes still apply:
 - If using .htaccess, include the trailing `/` on the URL you register
 - The URL must be publicly reachable (localhost won't receive events)
 - Test-post to it first and confirm your handler actually sees the POST body
@@ -48,7 +50,9 @@ Note `transaction.*` overlaps with the others: a successful transfer also produc
 
 ## Signature verification
 
-Lenco sends `X-Lenco-Signature`: an HMAC-SHA512 of the event payload, keyed by `webhook_hash_key`, which is the SHA256 hex digest of your API token.
+Lenco sends `X-Lenco-Signature`: an HMAC-SHA512 of the event payload, keyed by your **webhook signing secret from the dashboard** (verified in production, 2026-08-07).
+
+> **Legacy note:** Lenco's older docs and examples derive the key as the SHA256 hex digest of your API token (`webhook_hash_key`) instead of a dashboard-issued secret. Lenco ships no changelog, so if signature verification fails with the dashboard secret on an older account, try the derived key — and prefer the dashboard secret everywhere else.
 
 ### Raw body vs re-serialized — Lenco's own examples disagree
 
@@ -67,12 +71,11 @@ import * as crypto from 'crypto';
 export function verifyLencoSignature(
   rawBody: Buffer,
   signatureHeader: string | undefined,
-  apiToken: string,
+  webhookSecret: string,   // from the Lenco dashboard's webhook settings, via env
 ): boolean {
   if (!signatureHeader) return false;
 
-  const webhookHashKey = crypto.createHash('sha256').update(apiToken).digest('hex');
-  const expected = crypto.createHmac('sha512', webhookHashKey).update(rawBody).digest('hex');
+  const expected = crypto.createHmac('sha512', webhookSecret).update(rawBody).digest('hex');
 
   const a = Buffer.from(expected, 'utf8');
   const b = Buffer.from(signatureHeader, 'utf8');
@@ -112,7 +115,7 @@ export class LencoWebhookGuard implements CanActivate {
     return verifyLencoSignature(
       req.rawBody,
       req.headers['x-lenco-signature'] as string,
-      this.config.get('lenco.apiToken')!,
+      this.config.get('lenco.webhookSecret')!,
     );
   }
 }

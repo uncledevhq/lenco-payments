@@ -53,14 +53,14 @@ src/lenco/
 export const lencoConfig = registerAs('lenco', () => ({
   apiToken: process.env.LENCO_API_TOKEN,
   publicKey: process.env.LENCO_PUBLIC_KEY,
+  webhookSecret: process.env.LENCO_WEBHOOK_SECRET,  // copy from the Lenco dashboard's webhook settings
   baseUrl: process.env.LENCO_ENVIRONMENT === 'production'
     ? 'https://api.lenco.co/access/v2'
     : 'https://api.sandbox.lenco.co/access/v2',
-  webhookHashKey: crypto.createHash('sha256').update(process.env.LENCO_API_TOKEN!).digest('hex'),
 }));
 ```
 
-Validate these at startup (Zod or class-validator on a config class) — don't let the app boot with a missing `LENCO_API_TOKEN` and fail on the first payment attempt instead.
+Validate these at startup (Zod or class-validator on a config class) — don't let the app boot with a missing `LENCO_API_TOKEN` or `LENCO_WEBHOOK_SECRET` and fail on the first payment or webhook instead. (Older Lenco docs derived the webhook key as SHA256 of the API token — the dashboard now issues a dedicated signing secret; see `references/webhooks.md`.)
 
 ### Service pattern
 
