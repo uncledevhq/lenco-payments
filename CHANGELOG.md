@@ -4,6 +4,11 @@ Lenco ships no changelog for their API — this skill does. Every content correc
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions are dated; "verified in production" means confirmed against a live Lenco account, which outranks "transcribed from docs."
 
+## [1.2.0] — 2026-08-07
+
+### Added
+- `references/webhooks.md`: raw-body recipes beyond NestJS — Supabase Edge Functions/Deno, Express, Next.js App Router, Fastify — plus the Supabase `verify_jwt` trap that silently 401s Lenco's webhooks before your handler runs.
+
 ## [1.1.0] — 2026-08-07
 
 ### Corrected (verified in production)

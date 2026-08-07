@@ -123,6 +123,45 @@ export class LencoWebhookGuard implements CanActivate {
 
 Failing closed when `rawBody` is missing matters: if someone later removes `rawBody: true`, you want webhooks to break loudly, not to silently skip verification.
 
+### Raw body in other runtimes
+
+The rule is runtime-independent — **HMAC the exact bytes off the wire, then parse**. The only thing that varies is how each framework lets you reach the bytes before its JSON parser eats them:
+
+```typescript
+// Supabase Edge Function / Deno — bodies arrive unparsed; text() first, parse after verify.
+// Deno supports node:crypto, so verifyLencoSignature() works as-is.
+Deno.serve(async (req) => {
+  const raw = await req.text();
+  const ok = verifyLencoSignature(
+    Buffer.from(raw),
+    req.headers.get('x-lenco-signature') ?? undefined,
+    Deno.env.get('LENCO_WEBHOOK_SECRET')!,
+  );
+  if (!ok) return new Response(null, { status: 401 });
+  const event = JSON.parse(raw);          // only after verification
+  // enqueue, then:
+  return new Response(JSON.stringify({ received: true }), { status: 200 });
+});
+```
+
+Supabase-specific trap: edge functions verify a Supabase JWT **before your code runs** by default — Lenco sends no JWT, so every webhook 401s and your handler never sees it. Deploy the function with `--no-verify-jwt` (or `verify_jwt = false` in `config.toml`), which makes the signature check the only auth on the route — so it had better be there.
+
+```typescript
+// Express — keep raw bytes alongside the parsed body
+app.use(express.json({ verify: (req: any, _res, buf) => { req.rawBody = buf; } }));
+
+// Next.js App Router route handler — bodies arrive unparsed, same shape as Deno
+export async function POST(req: Request) {
+  const raw = await req.text();
+  // verify over Buffer.from(raw), then JSON.parse(raw)
+}
+
+// Fastify — JSON parsing is built-in and eats the bytes; use the fastify-raw-body
+// plugin (or addContentTypeParser with { parseAs: 'buffer' }) to keep them
+```
+
+Whatever the runtime, the anti-pattern is the same: if your verification code contains `JSON.stringify`, it's hashing a *reconstruction* of the body, not the body — see "Raw body vs re-serialized" above.
+
 ## Responding
 
 Respond **200, 201, or 202**. Anything else is treated as unacknowledged and Lenco retries **every 30 minutes for 24 hours**. The response body is discarded — only the status code is read.
